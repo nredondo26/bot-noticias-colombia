@@ -148,9 +148,6 @@ def post_one_article(logger, skip_cooldown=False):
     logger.info("  Publicando en Facebook...")
     fb_result = post_to_facebook(real_page_id, page_token, post_data["texto"], result_image)
 
-    if os.path.exists(image_path):
-        os.remove(image_path)
-
     if fb_result["success"]:
         logger.info(f"  POST PUBLICADO! ID: {fb_result['post_id']}")
         history = load_published()
@@ -177,9 +174,14 @@ def post_one_article(logger, skip_cooldown=False):
                 if os.path.exists(video_path):
                     os.remove(video_path)
 
+        if os.path.exists(result_image):
+            os.remove(result_image)
+
         return True
     else:
         logger.error(f"  Error: {fb_result.get('error', '')}")
+        if os.path.exists(result_image):
+            os.remove(result_image)
         return False
 
 
