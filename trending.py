@@ -37,7 +37,7 @@ def get_trending_hashtags(country="Colombia"):
     return list(hashtags)[:15]
 
 
-def pick_relevant_hashtags(text, available_hashtags, max_hashtags=5):
+def pick_relevant_hashtags(text, available_hashtags, min_hashtags=3, max_hashtags=5):
     text_lower = text.lower()
     scored = []
     for tag in available_hashtags:
@@ -47,4 +47,14 @@ def pick_relevant_hashtags(text, available_hashtags, max_hashtags=5):
             scored.append((tag, 1))
 
     scored.sort(key=lambda x: x[1], reverse=True)
-    return [f"#{tag}" for tag, _ in scored[:max_hashtags]]
+    result = [f"#{tag}" for tag, _ in scored[:max_hashtags]]
+
+    fallback = ["noticias", "colombia", "actualidad", "politica", "pueblo"]
+    for fb in fallback:
+        if len(result) >= min_hashtags:
+            break
+        tag_str = f"#{fb}"
+        if tag_str not in result:
+            result.append(tag_str)
+
+    return result
