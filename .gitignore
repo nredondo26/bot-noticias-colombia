@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+assets/
+logs/
+*.log
+.env
+test_fb.py
+get_page_token.py
+politica_privacidad.html
+setup_token.py
+config_cloud.py
