@@ -4,11 +4,13 @@ import json
 
 
 def ensure_page_token(page_id, token):
+    print(f"  ensure_page_token: page_id={page_id}, token_len={len(token) if token else 0}")
     url = f"https://graph.facebook.com/v21.0/me/accounts"
     params = {"access_token": token}
     try:
         resp = requests.get(url, params=params, timeout=15)
         data = resp.json()
+        print(f"  me/accounts response: {json.dumps(data, indent=2)[:500]}")
         pages = data.get("data", [])
         if pages:
             for p in pages:
