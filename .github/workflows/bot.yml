@@ -25,6 +25,16 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Restore data cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            logs/published.json
+            logs/queue.json
+            logs/responded_comments.json
+          key: bot-data-${{ github.run_id }}
+          restore-keys: bot-data-
+
       - name: Create directories
         run: mkdir -p assets logs
 
@@ -35,10 +45,18 @@ jobs:
           FACEBOOK_PAGE_ACCESS_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
         run: python main.py --${{ github.event.inputs.mode || 'single' }}
 
+      - name: Save data cache
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            logs/published.json
+            logs/queue.json
+            logs/responded_comments.json
+          key: bot-data-${{ github.run_id }}
+
   report:
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule'
-    needs: publish
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,6 +68,16 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
+
+      - name: Restore data cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            logs/published.json
+            logs/queue.json
+            logs/responded_comments.json
+          key: bot-data-${{ github.run_id }}
+          restore-keys: bot-data-
 
       - name: Send daily report
         env:
