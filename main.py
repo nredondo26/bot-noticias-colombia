@@ -104,8 +104,8 @@ def fetch_news_and_fill_queue(logger):
     logger.info(f"  Cola actual: {added} noticias pendientes")
 
 
-def post_one_article(logger):
-    if not can_post_now(cooldown_hours=2):
+def post_one_article(logger, skip_cooldown=False):
+    if not skip_cooldown and not can_post_now(cooldown_hours=2):
         logger.info("Cooldown activo. Esperando 2 horas entre posts.")
         return False
 
@@ -267,7 +267,7 @@ def run(mode="single", dry_run=False):
         cleanup_old_articles()
         if queue_size() < 3:
             fetch_news_and_fill_queue(logger)
-        success = post_one_article(logger)
+        success = post_one_article(logger, skip_cooldown=True)
         auto_reply_comments(logger)
         return success
 
@@ -280,10 +280,7 @@ def run(mode="single", dry_run=False):
                 fetch_news_and_fill_queue(logger)
             if queue_size() == 0:
                 break
-            if posted > 0 and not can_post_now(cooldown_hours=0):
-                import time
-                time.sleep(5)
-            if post_one_article(logger):
+            if post_one_article(logger, skip_cooldown=True):
                 posted += 1
         auto_reply_comments(logger)
         logger.info(f"Total publicados: {posted}")

@@ -1,5 +1,11 @@
 import os
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 
 FACEBOOK_PAGE_ID = os.environ.get("FACEBOOK_PAGE_ID", "")
