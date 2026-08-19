@@ -1,6 +1,9 @@
+import os
 import requests
 import json
 from datetime import datetime
+
+REPORT_RECIPIENT_ID = os.environ.get("REPORT_RECIPIENT_ID", "")
 
 
 def get_post_stats(post_id, access_token):
@@ -43,9 +46,7 @@ def get_page_stats(page_id, access_token):
         return {}
 
 
-def generate_daily_report(api_key, published_today, page_id, access_token):
-    from ai_analyzer import create_client, _call_gemini
-
+def generate_daily_report(published_today, page_id, access_token):
     stats = []
     total_likes = 0
     total_comments = 0
@@ -82,3 +83,40 @@ MEJORES POSTS:
         report += f"  {i}. {s['message']}... (L:{s['likes']} C:{s['comments']} S:{s['shares']})\n"
 
     return report
+
+
+def send_report_to_messenger(recipient_id, report_text, page_access_token):
+    url = "https://graph.facebook.com/v21.0/me/messages"
+    data = {
+        "recipient": json.dumps({"id": recipient_id}),
+        "message": report_text,
+        "access_token": page_access_token,
+    }
+    try:
+        resp = requests.post(url, data=data, timeout=15)
+        result = resp.json()
+        if "message_id" in result:
+            print(f"  Reporte enviado por Messenger")
+            return True
+        else:
+            print(f"  Error enviando Messenger: {result.get('error', {}).get('message', '')}")
+            return False
+    except Exception as e:
+        print(f"  Error enviando Messenger: {e}")
+        return False
+
+
+def detect_messenger_user(page_id, access_token):
+    url = f"https://graph.facebook.com/v21.0/{page_id}/conversations"
+    params = {"access_token": access_token, "fields": "participants", "limit": 5}
+    try:
+        resp = requests.get(url, params=params, timeout=15)
+        data = resp.json()
+        for conv in data.get("data", []):
+            participants = conv.get("participants", {}).get("data", [])
+            for p in participants:
+                if p.get("id") != page_id:
+                    return p["id"]
+    except Exception:
+        pass
+    return None

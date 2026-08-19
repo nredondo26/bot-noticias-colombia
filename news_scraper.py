@@ -14,14 +14,6 @@ def build_google_news_url(query, language="es-419", country="CO"):
     )
 
 
-def extract_original_url(google_news_url):
-    try:
-        resp = requests.get(google_news_url, timeout=10, allow_redirects=True)
-        return resp.url
-    except Exception:
-        return google_news_url
-
-
 def clean_html(html_text):
     if not html_text:
         return ""
@@ -29,7 +21,37 @@ def clean_html(html_text):
     return soup.get_text(separator=" ", strip=True)
 
 
-def fetch_news(queries, language="es-419", country="CO", max_articles=10):
+def extract_image_from_entry(entry):
+    media = entry.get("media_content", [])
+    if media and isinstance(media, list):
+        url = media[0].get("url", "")
+        if url:
+            return url
+
+    media_thumb = entry.get("media_thumbnail", [])
+    if media_thumb and isinstance(media_thumb, list):
+        url = media_thumb[0].get("url", "")
+        if url:
+            return url
+
+    enclosures = entry.get("enclosures", [])
+    for enc in enclosures:
+        if enc.get("type", "").startswith("image"):
+            return enc.get("href", "")
+
+    content_html = entry.get("content", [{}])
+    if isinstance(content_html, list) and content_html:
+        html_text = content_html[0].get("value", "")
+    else:
+        html_text = str(content_html)
+    match = re.search(r'<img[^>]+src=["\']([^"\']+)["\']', html_text)
+    if match:
+        return match.group(1)
+
+    return ""
+
+
+def fetch_news(queries, language="es-419", country="CO", max_articles=30):
     all_articles = []
     seen_titles = set()
 
@@ -37,40 +59,25 @@ def fetch_news(queries, language="es-419", country="CO", max_articles=10):
         url = build_google_news_url(query, language, country)
         try:
             feed = feedparser.parse(url)
-            for entry in feed.entries[:5]:
+            for entry in feed.entries[:8]:
                 title = entry.get("title", "").strip()
                 title_lower = title.lower()
 
-                if any(seen in title_lower for seen in seen_titles):
+                skip = False
+                for seen in seen_titles:
+                    if seen in title_lower or title_lower in seen:
+                        skip = True
+                        break
+                if skip:
                     continue
 
                 summary = clean_html(entry.get("summary", ""))
+                if len(summary) < 30:
+                    continue
+
                 published = entry.get("published", "")
                 source_url = entry.get("link", "")
-
-                image_url = ""
-                media = entry.get("media_content", [])
-                if media and isinstance(media, list):
-                    image_url = media[0].get("url", "")
-                if not image_url:
-                    media_thumb = entry.get("media_thumbnail", [])
-                    if media_thumb and isinstance(media_thumb, list):
-                        image_url = media_thumb[0].get("url", "")
-                if not image_url:
-                    enclosures = entry.get("enclosures", [])
-                    for enc in enclosures:
-                        if enc.get("type", "").startswith("image"):
-                            image_url = enc.get("href", "")
-                            break
-                if not image_url:
-                    content_html = entry.get("content", [{}])
-                    if isinstance(content_html, list) and content_html:
-                        html_text = content_html[0].get("value", "")
-                    else:
-                        html_text = str(content_html)
-                    match = re.search(r'<img[^>]+src=["\']([^"\']+)["\']', html_text)
-                    if match:
-                        image_url = match.group(1)
+                image_url = extract_image_from_entry(entry)
 
                 article = {
                     "title": title,
@@ -94,7 +101,7 @@ def fetch_news(queries, language="es-419", country="CO", max_articles=10):
     return all_articles[:max_articles]
 
 
-def get_trending_news(queries=None, language="es-419", country="CO", max_articles=10):
+def get_trending_news(queries=None, language="es-419", country="CO", max_articles=30):
     from config import NEWS_QUERIES
 
     if queries is None:

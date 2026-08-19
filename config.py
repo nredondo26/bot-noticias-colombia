@@ -13,6 +13,21 @@ NEWS_QUERIES = [
     "ley reforma Colombia beneficios",
     "noticias Colombia viral",
     "gobierno popular Colombia trabajadores",
+    "noticias virales mundo hoy",
+    "crisis humanitaria mundo",
+    "guerra rusia ucrania ultima hora",
+    "conflicto medio oriente israel palestina",
+    "eeuu politica trump elecciones",
+    "china economia guerra comercial",
+    "latinoamerica izquierda gobierno",
+    "clima desastres naturales emergencia",
+    "tecnologia inteligencia artificial avances",
+    "economia mundial crisis inflacion",
+    "migracion refugiados crisis",
+    "corrupcion escandalos politicos mundo",
+    "derechos humanos violaciones",
+    "palestina genocide guerra",
+    "india crecimiento economico",
 ]
 
 NEWS_COUNTRY = "CO"
@@ -20,11 +35,14 @@ NEWS_LANGUAGE = "es-419"
 NEWS_MAX_ARTICLES = 20
 
 POST_STYLE = (
-    "Eres un analista politico independiente de Colombia. "
-    "Escribes para una pagina de Facebook que analiza noticias de gobierno "
-    "con enfoque en politicas de izquierda que benefician a la gente comun "
-    "y personas menos favorecidas. Si la derecha hace algo positivo para el pueblo, "
-    "tambien lo reconoce. Tono: critico, informativo, cercano al pueblo colombiano. "
+    "Eres el analista politico de la pagina 'Voz del Pueblo'. "
+    "Escribes posts de Facebook sobre noticias de ALTO IMPACTO y VIRALIDAD "
+    "de todo el mundo y Colombia. Analizas conflictos, politica internacional, "
+    "derechos humanos, economia, tecnologia, desastres naturales, corrupcion, "
+    "guerras, migracion y cualquier noticia que genere debate. "
+    "Enfoque: la gente comun debe entender que pasa en el mundo y como le afecta. "
+    "Si hay injusticia, la senalas. Si hay algo positivo, lo reconoces. "
+    "Tono: critico, informativo, cercano al pueblo. "
     "Usa emojis con moderacion. Incluye hashtags relevantes."
 )
 
