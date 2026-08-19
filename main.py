@@ -18,6 +18,8 @@ from post_queue import add_to_queue, pop_next_article, queue_size, can_post_now,
 from facebook_responder import get_post_comments, reply_to_comment, get_recent_posts, generate_reply
 from trending import get_trending_hashtags, pick_relevant_hashtags
 from stats_reporter import generate_daily_report, send_report_to_messenger
+from video_generator import create_reel_video
+from facebook_reels import post_reel
 
 PUBLISHED_FILE = os.path.join(LOGS_DIR, "published.json")
 RESPONDED_FILE = os.path.join(LOGS_DIR, "responded_comments.json")
@@ -150,10 +152,31 @@ def post_one_article(logger):
         os.remove(image_path)
 
     if fb_result["success"]:
-        logger.info(f"  PUBLICADO! ID: {fb_result['post_id']}")
+        logger.info(f"  POST PUBLICADO! ID: {fb_result['post_id']}")
         history = load_published()
         mark_published(article, fb_result["post_id"], history)
         save_published(history)
+
+        if image_path and os.path.exists(result_image):
+            logger.info("  Generando Reel...")
+            today_str2 = datetime.now().strftime("%Y%m%d_%H%M%S")
+            video_path = os.path.join(ASSETS_DIR, f"reel_{today_str2}.mp4")
+            reel_result = create_reel_video(
+                post_data["texto"],
+                [result_image],
+                video_path,
+                duration_per_slide=5,
+            )
+            if reel_result:
+                hashtags_text = " ".join(post_hashtags) if post_hashtags else ""
+                reel_fb = post_reel(real_page_id, page_token, video_path, post_data["texto"][:200], hashtags_text)
+                if reel_fb["success"]:
+                    logger.info(f"  REEL PUBLICADO! ID: {reel_fb.get('video_id', '')}")
+                else:
+                    logger.warning(f"  Error Reel: {reel_fb.get('error', '')}")
+                if os.path.exists(video_path):
+                    os.remove(video_path)
+
         return True
     else:
         logger.error(f"  Error: {fb_result.get('error', '')}")
