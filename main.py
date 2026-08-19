@@ -157,7 +157,7 @@ def post_one_article(logger, skip_cooldown=False):
         mark_published(article, fb_result["post_id"], history)
         save_published(history)
 
-        if image_path and os.path.exists(result_image):
+        if result_image and os.path.exists(result_image):
             logger.info("  Generando Reel...")
             today_str2 = datetime.now().strftime("%Y%m%d_%H%M%S")
             video_path = os.path.join(ASSETS_DIR, f"reel_{today_str2}.mp4")
