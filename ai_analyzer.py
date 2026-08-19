@@ -241,7 +241,7 @@ REGLAS:
 - NO inventes informacion. Solo comenta lo que dice la noticia.
 - Si es sobre corrupcion o algo negativo, pide reflexion a los seguidores.
 - Si hay datos o cifras, mencionalos.
-- Cierra con una pregunta o invitacion al debate.""""
+- Cierra con una pregunta o invitacion al debate."""
 
     try:
         response = _call_gemini(client, prompt, structured=True)
