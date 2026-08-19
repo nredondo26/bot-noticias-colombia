@@ -17,7 +17,7 @@ from facebook_poster import post_to_facebook, verify_token
 from post_queue import add_to_queue, pop_next_article, queue_size, can_post_now, cleanup_old_articles
 from facebook_responder import get_post_comments, reply_to_comment, get_recent_posts, generate_reply
 from trending import get_trending_hashtags, pick_relevant_hashtags
-from stats_reporter import generate_daily_report
+from stats_reporter import generate_daily_report, send_report_to_messenger
 
 PUBLISHED_FILE = os.path.join(LOGS_DIR, "published.json")
 RESPONDED_FILE = os.path.join(LOGS_DIR, "responded_comments.json")
@@ -209,11 +209,16 @@ def send_daily_report(logger):
         logger.info("No hubo posts hoy. Saltando reporte.")
         return
 
-    report = generate_daily_report(GEMINI_API_KEY, published_today, real_page_id, page_token)
+    report = generate_daily_report(published_today, real_page_id, page_token)
     logger.info(f"\n{report}")
 
-    post_to_facebook(real_page_id, page_token, report)
-    logger.info("Reporte publicado en la pagina.")
+    recipient_id = os.environ.get("REPORT_RECIPIENT_ID", "2572243889888389")
+    if recipient_id:
+        send_report_to_messenger(recipient_id, report, page_token)
+        logger.info("Reporte enviado por Messenger.")
+    else:
+        post_to_facebook(real_page_id, page_token, report)
+        logger.info("Reporte publicado en la pagina.")
 
 
 def run(mode="single", dry_run=False):

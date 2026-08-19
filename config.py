@@ -55,4 +55,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ASSETS_DIR = os.path.join(BASE_DIR, "assets")
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
 
+REPORT_RECIPIENT_ID = os.environ.get("REPORT_RECIPIENT_ID", "2572243889888389")
+
 POSTS_PER_RUN = 10
