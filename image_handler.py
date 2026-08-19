@@ -106,49 +106,74 @@ def create_reflection_image(output_path, articles, text="Colombia", W=1200, H=63
     draw = ImageDraw.Draw(img)
 
     palettes = [
-        [(180, 30, 30), (220, 100, 30), (20, 60, 130)],
-        [(20, 100, 180), (30, 180, 120), (180, 200, 30)],
-        [(120, 30, 140), (200, 50, 80), (30, 80, 160)],
-        [(30, 120, 100), (200, 140, 30), (180, 40, 80)],
-        [(200, 60, 30), (30, 80, 180), (100, 180, 30)],
+        [(220, 50, 50), (255, 140, 0), (255, 220, 0)],
+        [(0, 150, 200), (0, 200, 120), (180, 230, 0)],
+        [(180, 30, 180), (230, 60, 120), (50, 120, 220)],
+        [(255, 80, 30), (255, 180, 0), (0, 180, 100)],
+        [(0, 100, 200), (100, 0, 200), (200, 50, 100)],
+        [(50, 200, 150), (200, 100, 0), (180, 0, 80)],
+        [(255, 60, 100), (255, 160, 50), (50, 200, 200)],
+        [(100, 0, 180), (255, 100, 50), (255, 220, 50)],
+        [(0, 180, 80), (0, 120, 220), (180, 60, 200)],
+        [(220, 40, 80), (255, 200, 30), (30, 180, 160)],
+        [(150, 30, 200), (255, 80, 80), (255, 200, 0)],
+        [(0, 200, 180), (200, 0, 150), (255, 150, 0)],
     ]
-    colors = palettes[hash(text) % len(palettes)]
+    colors = palettes[hash(text + str(random.randint(0, 100))) % len(palettes)]
 
     for y in range(H):
         t = y / H
-        if t < 0.5:
-            t2 = t / 0.5
-            r = int(colors[0][0] * (1 - t2) + colors[1][0] * t2)
-            g = int(colors[0][1] * (1 - t2) + colors[1][1] * t2)
-            b = int(colors[0][2] * (1 - t2) + colors[1][2] * t2)
+        wave = math.sin(t * math.pi * 2 + random.random()) * 15
+        if t < 0.33:
+            t2 = t / 0.33
+            r = int(colors[0][0] * (1 - t2) + colors[1][0] * t2 + wave)
+            g = int(colors[0][1] * (1 - t2) + colors[1][1] * t2 + wave)
+            b = int(colors[0][2] * (1 - t2) + colors[1][2] * t2 + wave)
+        elif t < 0.66:
+            t2 = (t - 0.33) / 0.33
+            r = int(colors[1][0] * (1 - t2) + colors[2][0] * t2 + wave)
+            g = int(colors[1][1] * (1 - t2) + colors[2][1] * t2 + wave)
+            b = int(colors[1][2] * (1 - t2) + colors[2][2] * t2 + wave)
         else:
-            t2 = (t - 0.5) / 0.5
-            r = int(colors[1][0] * (1 - t2) + colors[2][0] * t2)
-            g = int(colors[1][1] * (1 - t2) + colors[2][1] * t2)
-            b = int(colors[1][2] * (1 - t2) + colors[2][2] * t2)
+            t2 = (t - 0.66) / 0.34
+            r = int(colors[2][0] * (1 - t2) + colors[0][0] * t2 + wave)
+            g = int(colors[2][1] * (1 - t2) + colors[0][1] * t2 + wave)
+            b = int(colors[2][2] * (1 - t2) + colors[0][2] * t2 + wave)
+        r = max(0, min(255, r))
+        g = max(0, min(255, g))
+        b = max(0, min(255, b))
         draw.line([(0, y), (W, y)], fill=(r, g, b))
 
-    for i in range(6):
-        cx = random.randint(0, W)
-        cy = random.randint(0, H)
-        size = random.randint(80, 250)
-        for ring in range(size, 0, -3):
-            alpha = int(20 * (1 - ring / size))
-            r2 = colors[i % 3][0]
-            g2 = colors[i % 3][1]
-            b2 = colors[i % 3][2]
-            bright = min(255, r2 + alpha * 3)
-            draw.ellipse([cx - ring, cy - ring, cx + ring, cy + ring],
-                         outline=(bright, min(255, g2 + alpha * 2), min(255, b2 + alpha * 2)))
+    for i in range(8):
+        cx = random.randint(-100, W + 100)
+        cy = random.randint(-100, H + 100)
+        size = random.randint(60, 200)
+        c = colors[i % 3]
+        for ring in range(size, 0, -4):
+            intensity = int(40 * (1 - ring / size))
+            r2 = min(255, c[0] + intensity * 4)
+            g2 = min(255, c[1] + intensity * 3)
+            b2 = min(255, c[2] + intensity * 2)
+            draw.ellipse([cx - ring, cy - ring, cx + ring, cy + ring], outline=(r2, g2, b2))
 
-    for i in range(40):
+    for i in range(25):
         x = random.randint(0, W)
         y = random.randint(0, H)
-        size = random.randint(1, 4)
+        size = random.randint(3, 12)
+        c = colors[random.randint(0, 2)]
+        alpha = random.randint(100, 255)
+        draw.ellipse([x, y, x + size, y + size], fill=(min(255, c[0] + alpha), min(255, c[1] + alpha), min(255, c[2] + alpha)))
+
+    for i in range(30):
+        x = random.randint(0, W)
+        y = random.randint(0, H)
+        size = random.randint(1, 3)
         draw.ellipse([x, y, x + size, y + size], fill=(255, 255, 255))
 
-    draw.line([(0, 3), (W, 3)], fill=(255, 255, 255), width=4)
-    draw.line([(0, H - 3), (W, H - 3)], fill=(255, 255, 255), width=4)
+    draw.line([(0, 4), (W, 4)], fill=(255, 255, 255), width=5)
+    draw.line([(0, H - 4), (W, H - 4)], fill=(255, 255, 255), width=5)
+    draw.line([(4, 0), (4, H)], fill=(255, 255, 255), width=3)
+    draw.line([(W - 4, 0), (W - 4, H)], fill=(255, 255, 255), width=3)
 
     try:
         font_quote = ImageFont.truetype("C:/Windows/Fonts/ariali.ttf", 30)
@@ -184,7 +209,7 @@ def create_reflection_image(output_path, articles, text="Colombia", W=1200, H=63
         tw = bbox[2] - bbox[0]
         x = (W - tw) // 2
         y = start_y + i * 44
-        draw.text((x + 2, y + 2), line, fill=(0, 0, 0), font=font_quote)
+        draw.text((x + 3, y + 3), line, fill=(0, 0, 0), font=font_quote)
         draw.text((x, y), line, fill=(255, 255, 255), font=font_quote)
 
     draw.line([(W // 2 - 120, start_y + len(lines) * 44 + 15), (W // 2 + 120, start_y + len(lines) * 44 + 15)],
@@ -199,7 +224,7 @@ def create_reflection_image(output_path, articles, text="Colombia", W=1200, H=63
     sub = "Analisis Politico del Dia"
     bbox_s = draw.textbbox((0, 0), sub, font=font_sub)
     tw_s = bbox_s[2] - bbox_s[0]
-    draw.text(((W - tw_s) // 2, H - 28), sub, fill=(220, 220, 220), font=font_sub)
+    draw.text(((W - tw_s) // 2, H - 28), sub, fill=(255, 255, 255), font=font_sub)
 
     img.save(output_path, "JPEG", quality=90)
     print(f"  Imagen con reflexion creada: {output_path}")
