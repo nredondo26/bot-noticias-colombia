@@ -13,7 +13,7 @@ def get_trending_hashtags(country="Colombia"):
         )
         text = resp.text
         found = re.findall(r'#(\w+)', text)
-        hashtags.update(h.lower() for h in found if len(h) > 3)
+        hashtags.update(h.lower() for h in found if len(h) > 3 and not re.match(r'^[0-9a-f]{3,8}$', h))
     except Exception:
         pass
 
@@ -24,7 +24,7 @@ def get_trending_hashtags(country="Colombia"):
             headers={"User-Agent": "Mozilla/5.0"},
         )
         found = re.findall(r'#(\w+)', resp.text)
-        hashtags.update(h.lower() for h in found if len(h) > 3)
+        hashtags.update(h.lower() for h in found if len(h) > 3 and not re.match(r'^[0-9a-f]{3,8}$', h))
     except Exception:
         pass
 
