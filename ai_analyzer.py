@@ -231,13 +231,17 @@ Fuente: {article['source']}
 Resumen: {article['summary']}
 
 REGLAS:
-- El post debe tener entre 200 y {max_length} caracteres
+- El post debe tener entre 400 y 800 caracteres. NO seas corto, escribe un analisis completo.
+- Si la noticia viene de una pagina o medio especifico, mencionalo y referencia la fuente.
+- Escribe como si le hablaras a la gente del pueblo, con contexto y opinion.
 - Incluye emojis con moderacion (3-5 maximo)
 - Incluye 3-5 hashtags relevantes al final
 - Tono: analitico, cercano al pueblo, sin ser agresivo
 - imagen_keywords: 3 palabras en espanol relacionadas con la noticia
 - NO inventes informacion. Solo comenta lo que dice la noticia.
-- Si es sobre corrupcion o algo negativo, pide reflexion a los seguidores."""
+- Si es sobre corrupcion o algo negativo, pide reflexion a los seguidores.
+- Si hay datos o cifras, mencionalos.
+- Cierra con una pregunta o invitacion al debate.""""
 
     try:
         response = _call_gemini(client, prompt, structured=True)
