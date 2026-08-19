@@ -251,6 +251,10 @@ def run(mode="single", dry_run=False):
     logger.info(f"Modo: {mode}")
     logger.info("=" * 60)
 
+    logger.info(f"GEMINI_API_KEY: {'CONFIGURADO' if GEMINI_API_KEY else 'VACIO'}")
+    logger.info(f"FACEBOOK_PAGE_ID: {'CONFIGURADO' if FACEBOOK_PAGE_ID else 'VACIO'}")
+    logger.info(f"FACEBOOK_PAGE_ACCESS_TOKEN: {'CONFIGURADO' if FACEBOOK_PAGE_ACCESS_TOKEN else 'VACIO'}")
+
     if mode == "fetch":
         fetch_news_and_fill_queue(logger)
         return True
